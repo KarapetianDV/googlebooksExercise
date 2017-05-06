@@ -95,19 +95,14 @@ public class BookUtils {
                 JSONArray authors = volumeInfo.getJSONArray("authors");
 
                 StringBuilder builder = new StringBuilder();
+                String delim = "";
                 for (int j = 0; j < authors.length(); j++) {
-                    if (authors.length() == j)
-                        builder.append(authors.get(j));
-
-                    if (authors.length() < j)
-                        builder.append(authors.get(j)).append(", ");
+                    builder.append(delim).append(authors.get(j));
+                    delim = ", ";
                 }
                 String author = builder.toString();
 
-                JSONArray imageLinks = volumeInfo.getJSONArray("imageLinks");
-                String smallThumbnailUrl = imageLinks.getString(0);
-
-                books.add(new Book(title, author, smallThumbnailUrl));
+                books.add(new Book(title, author));
             }
         } catch (JSONException e) {
             e.printStackTrace();
