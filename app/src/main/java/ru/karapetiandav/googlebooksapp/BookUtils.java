@@ -83,8 +83,7 @@ public class BookUtils {
         ArrayList<Book> books = new ArrayList<>();
 
         try {
-            // TODO: переделать обратно
-            JSONObject root = new JSONObject(url);
+            JSONObject root = new JSONObject(makeHttpRequest(createUrl(url)));
             JSONArray items = root.getJSONArray("items");
 
             for (int i = 0; i < items.length(); i++) {
@@ -106,10 +105,9 @@ public class BookUtils {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
         return books;
     }
