@@ -1,5 +1,7 @@
 package ru.karapetiandav.googlebooksapp;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +17,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class BookUtils {
+
+    private static final String TAG = BookUtils.class.getSimpleName();
 
     private BookUtils() {
     }
@@ -92,6 +96,10 @@ public class BookUtils {
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
                 String title = volumeInfo.getString("title");
                 JSONArray authors = volumeInfo.getJSONArray("authors");
+                JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
+
+                String smallThumbnail = imageLinks.getString("smallThumbnail");
+                Log.d(TAG, "extractBooks: " + smallThumbnail);
 
                 StringBuilder builder = new StringBuilder();
                 String delim = "";
@@ -101,7 +109,7 @@ public class BookUtils {
                 }
                 String author = builder.toString();
 
-                books.add(new Book(title, author));
+                books.add(new Book(smallThumbnail, title, author));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -109,6 +117,7 @@ public class BookUtils {
             e.printStackTrace();
         }
 
+        Log.d(TAG, "extractBooks: " + books);
         return books;
     }
 }

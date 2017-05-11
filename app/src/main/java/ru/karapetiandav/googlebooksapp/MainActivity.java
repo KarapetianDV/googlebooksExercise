@@ -9,11 +9,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -25,8 +27,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes";
     private int BOOK_QUERY_LOADER_ID = 1;
 
-    private ListView listView;
-    private BookAdapter bookAdapter;
+    private RecyclerView mRecyclerView;
+    private BookAdapter mRecyclerAdapter;
     private ProgressBar progressBar;
     private Toolbar toolbar;
     private EditText searchEditText;
@@ -41,22 +43,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        listView = (ListView) findViewById(R.id.listView);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         searchEditText = (EditText) findViewById(R.id.searchEditText);
 
-        bookAdapter = new BookAdapter(this, R.layout.list_item);
-
         emptyView_text = (TextView) findViewById(R.id.emptyView_text);
-        listView.setEmptyView(emptyView_text);
+        emptyView_text.setVisibility(View.GONE);
+
+        mRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerAdapter = new BookAdapter(this);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
+        addDivider(layoutManager);
 
         if (isConnected()) {
+            emptyView_text.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
             emptyView_text.setText(R.string.start_hint_text);
         } else {
+            emptyView_text.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
             emptyView_text.setText(R.string.no_internet_text);
-            Snackbar.make(listView, R.string.no_internet_text, Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(mRecyclerView, R.string.no_internet_text, Snackbar.LENGTH_INDEFINITE)
                     .setAction("Refresh", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -67,6 +76,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     })
                     .show();
         }
+    }
+
+    private void addDivider(LinearLayoutManager layoutManager) {
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                layoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
     @Override
@@ -90,21 +105,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<ArrayList<Book>> loader, ArrayList<Book> data) {
-        bookAdapter.clear();
+        mRecyclerAdapter.clear();
 
         if (data != null && !data.isEmpty())
-            bookAdapter.addAll(data);
+            Log.d(TAG, "onLoadFinished: " + data);
+        mRecyclerAdapter.addAll(data);
 
         progressBar.setVisibility(View.GONE);
         emptyView_text.setVisibility(View.GONE);
-        listView.setAdapter(bookAdapter);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
         Log.d(TAG, "onLoadFinished: ");
     }
 
 
     @Override
     public void onLoaderReset(Loader<ArrayList<Book>> loader) {
-        bookAdapter.clear();
+        mRecyclerAdapter.clear();
     }
 
     public void onSearchButtonClick(View view) {
