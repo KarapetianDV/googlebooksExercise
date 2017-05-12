@@ -1,7 +1,5 @@
 package ru.karapetiandav.googlebooksapp;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,7 +97,6 @@ public class BookUtils {
                 JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
 
                 String smallThumbnail = imageLinks.getString("smallThumbnail");
-                Log.d(TAG, "extractBooks: " + smallThumbnail);
 
                 StringBuilder builder = new StringBuilder();
                 String delim = "";
@@ -117,7 +114,6 @@ public class BookUtils {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "extractBooks: " + books);
         return books;
     }
 }

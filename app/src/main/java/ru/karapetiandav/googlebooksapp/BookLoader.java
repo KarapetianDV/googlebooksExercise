@@ -2,7 +2,6 @@ package ru.karapetiandav.googlebooksapp;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -15,7 +14,6 @@ public class BookLoader extends AsyncTaskLoader<ArrayList<Book>> {
     public BookLoader(Context context, String url) {
         super(context);
         this.url = url;
-        Log.d(TAG, "BookLoader: " + url);
     }
 
     @Override
