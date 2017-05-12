@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setSupportActionBar(toolbar);
 
         mRecyclerView = (ShimmerRecyclerView) findViewById(R.id.recyclerView);
-//        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         searchEditText = (EditText) findViewById(R.id.searchEditText);
 
         emptyView_text = (TextView) findViewById(R.id.emptyView_text);
@@ -58,11 +57,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if (isConnected()) {
             emptyView_text.setVisibility(View.VISIBLE);
-//            progressBar.setVisibility(View.GONE);
             emptyView_text.setText(R.string.start_hint_text);
         } else {
             emptyView_text.setVisibility(View.VISIBLE);
-//            progressBar.setVisibility(View.GONE);
             emptyView_text.setText(R.string.no_internet_text);
             Snackbar.make(mRecyclerView, R.string.no_internet_text, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.snackbar_tryagain_text, new View.OnClickListener() {
