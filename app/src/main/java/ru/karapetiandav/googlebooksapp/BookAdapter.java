@@ -16,6 +16,7 @@ import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
+    private static final String TAG = BookAdapter.class.getSimpleName();
     private Context mContext;
     private List<Book> mBooks = new ArrayList<>();
 
@@ -46,6 +47,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         Picasso
                 .with(mContext)
                 .load(book.getImageUrl())
+                .fit()
                 .into(bookImage);
 
         TextView bookTitle = holder.mBookTitle;

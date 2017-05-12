@@ -10,11 +10,12 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:hint="Enter book title"
-        android:maxLines="1" />
+        android:inputType="text"
+        android:lines="1" />
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:onClick="onSearchButtonClick"
         android:paddingLeft="8dp"

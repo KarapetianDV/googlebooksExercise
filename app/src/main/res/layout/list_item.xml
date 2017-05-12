@@ -15,7 +15,6 @@
         android:paddingBottom="8dp"
         tools:src="@drawable/imagetotest" />
 
-
     <TextView
         android:id="@+id/book_title"
         android:layout_width="wrap_content"
@@ -41,4 +40,5 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@android:color/black"
         tools:text="Donna Dewberry" />
+
 </RelativeLayout>

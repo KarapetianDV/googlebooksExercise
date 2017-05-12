@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">GoogleBooksApp</string>
+
+
     <string name="no_internet_text">No internet connection.</string>
-    <string name="start_hint_text">Enter book title for searching</string>
+    <string name="start_hint_text">Enter book title for searching.</string>
+
+    <!--Snackbar on main actiivty-->
+    <string name="snackbar_internet_text">No internet connection.</string>
+    <string name="snackbar_tryagain_text">Try again</string>
 </resources>

@@ -11,13 +11,12 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 
 import java.util.ArrayList;
 
@@ -27,9 +26,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes";
     private int BOOK_QUERY_LOADER_ID = 1;
 
-    private RecyclerView mRecyclerView;
+    private ShimmerRecyclerView mRecyclerView;
     private BookAdapter mRecyclerAdapter;
-    private ProgressBar progressBar;
+    //    private ProgressBar progressBar;
     private Toolbar toolbar;
     private EditText searchEditText;
     private TextView emptyView_text;
@@ -43,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mRecyclerView = (ShimmerRecyclerView) findViewById(R.id.recyclerView);
+//        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         searchEditText = (EditText) findViewById(R.id.searchEditText);
 
         emptyView_text = (TextView) findViewById(R.id.emptyView_text);
@@ -53,20 +52,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
+        addDivider(layoutManager);
         mRecyclerAdapter = new BookAdapter(this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
-        addDivider(layoutManager);
 
         if (isConnected()) {
             emptyView_text.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
+//            progressBar.setVisibility(View.GONE);
             emptyView_text.setText(R.string.start_hint_text);
         } else {
             emptyView_text.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
+//            progressBar.setVisibility(View.GONE);
             emptyView_text.setText(R.string.no_internet_text);
             Snackbar.make(mRecyclerView, R.string.no_internet_text, Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Refresh", new View.OnClickListener() {
+                    .setAction(R.string.snackbar_tryagain_text, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Bundle inLoader = new Bundle();
@@ -98,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         uriBuilder.appendQueryParameter("maxResults", "20");
 
         emptyView_text.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
+//        progressBar.setVisibility(View.VISIBLE);
 
         return new BookLoader(this, uriBuilder.toString());
     }
@@ -106,15 +105,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<ArrayList<Book>> loader, ArrayList<Book> data) {
         mRecyclerAdapter.clear();
+        mRecyclerView.hideShimmerAdapter();
 
         if (data != null && !data.isEmpty())
-            Log.d(TAG, "onLoadFinished: " + data);
-        mRecyclerAdapter.addAll(data);
+            mRecyclerAdapter.addAll(data);
 
-        progressBar.setVisibility(View.GONE);
+//        progressBar.setVisibility(View.GONE;
         emptyView_text.setVisibility(View.GONE);
-        mRecyclerView.setAdapter(mRecyclerAdapter);
-        Log.d(TAG, "onLoadFinished: ");
     }
 
 
@@ -127,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Bundle inLoader = new Bundle();
         inLoader.putString(QUERY_BUNDLE_KEY, searchEditText.getText().toString());
         getSupportLoaderManager().restartLoader(BOOK_QUERY_LOADER_ID, inLoader, this);
+        mRecyclerView.showShimmerAdapter();
     }
 
     private boolean isConnected() {

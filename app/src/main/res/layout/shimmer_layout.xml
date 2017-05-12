@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/shimmerImageView"
+        android:layout_width="75dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="8dp"
+        android:src="#BDBDBD" />
+
+    <TextView
+        android:id="@+id/shimmerText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_toRightOf="@+id/shimmerImageView"
+        android:background="@color/colorForText" />
+
+    <TextView
+        android:id="@+id/shimmerText2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/shimmerText1"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@+id/shimmerImageView"
+        android:background="@color/colorForText" />
+</RelativeLayout>

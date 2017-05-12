@@ -1,7 +1,6 @@
 package ru.karapetiandav.googlebooksapp;
 
 public class Book {
-
     private String imageUrl;
     private String title;
     private String author;
