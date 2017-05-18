@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">GoogleBooksApp</string>
 
-
+    <!--Main activity-->
     <string name="no_internet_text">No internet connection.</string>
     <string name="start_hint_text">Enter book title for searching.</string>
+    <string name="data_empty_text">Data not received</string>
+    <string name="conn_lost_text">Connection lost</string>
 
     <!--Snackbar on main actiivty-->
     <string name="snackbar_internet_text">No internet connection.</string>

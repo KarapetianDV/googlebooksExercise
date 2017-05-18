@@ -13,20 +13,20 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.karapetiandav.googlebooksapp.rest.Item;
+import ru.karapetiandav.googlebooksapp.rest.VolumeInfo;
+
+import static ru.karapetiandav.googlebooksapp.BookUtils.extractAuthors;
+
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     private static final String TAG = BookAdapter.class.getSimpleName();
     private Context mContext;
-    private List<Book> mBooks = new ArrayList<>();
+    private List<Item> mBookItems = new ArrayList<>();
 
     public BookAdapter(Context mContext) {
         this.mContext = mContext;
-    }
-
-    public BookAdapter(Context context, List<Book> books) {
-        this.mContext = context;
-        this.mBooks = books;
     }
 
     @Override
@@ -39,36 +39,37 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Book book = mBooks.get(position);
+        Item book = mBookItems.get(position);
+        VolumeInfo info = book.getVolumeInfo();
 
         ImageView bookImage = holder.mBookImage;
 
         // TODO: Create placeholder, error
         Picasso
                 .with(mContext)
-                .load(book.getImageUrl())
+                .load(info.getImageLinks().getSmallThumbnailUrl())
                 .fit()
                 .into(bookImage);
 
         TextView bookTitle = holder.mBookTitle;
-        bookTitle.setText(book.getTitle());
+        bookTitle.setText(info.getTitle());
 
         TextView bookAuthor = holder.mBookAuthors;
-        bookAuthor.setText(book.getAuthor());
+        bookAuthor.setText(extractAuthors(info.getAuthors()));
     }
 
     @Override
     public int getItemCount() {
-        return mBooks.size();
+        return mBookItems.size();
     }
 
     public void clear() {
-        mBooks.clear();
-        notifyItemRangeChanged(0, mBooks.size());
+        mBookItems.clear();
+        notifyItemRangeChanged(0, mBookItems.size());
     }
 
-    public void addAll(List<Book> data) {
-        mBooks = data;
+    public void addAll(List<Item> data) {
+        mBookItems = data;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

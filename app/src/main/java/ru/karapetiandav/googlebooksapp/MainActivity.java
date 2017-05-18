@@ -3,7 +3,6 @@ package ru.karapetiandav.googlebooksapp;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
@@ -12,27 +11,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<Book>> {
+import ru.karapetiandav.googlebooksapp.rest.Item;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Item>> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes";
     private int BOOK_QUERY_LOADER_ID = 1;
 
     private ShimmerRecyclerView mRecyclerView;
     private BookAdapter mRecyclerAdapter;
-    //    private ProgressBar progressBar;
     private Toolbar toolbar;
     private EditText searchEditText;
     private TextView emptyView_text;
     private String QUERY_BUNDLE_KEY = "query";
+    private boolean mHaveOfflineData = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,73 +57,93 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerAdapter = new BookAdapter(this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
 
+        // При повороте экрана, bundle != null, мы снова вызываем loader
+        // с уже готовыми данными
+        if (savedInstanceState != null) {
+            if (getSupportLoaderManager().getLoader(BOOK_QUERY_LOADER_ID) != null) {
+                getSupportLoaderManager().initLoader(BOOK_QUERY_LOADER_ID, null, this);
+                mHaveOfflineData = true;
+            }
+        }
+
         if (isConnected()) {
             emptyView_text.setVisibility(View.VISIBLE);
             emptyView_text.setText(R.string.start_hint_text);
         } else {
-            emptyView_text.setVisibility(View.VISIBLE);
-            emptyView_text.setText(R.string.no_internet_text);
-            Snackbar.make(mRecyclerView, R.string.no_internet_text, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.snackbar_tryagain_text, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Bundle inLoader = new Bundle();
-                            inLoader.putString(QUERY_BUNDLE_KEY, searchEditText.getText().toString());
-                            getSupportLoaderManager().restartLoader(BOOK_QUERY_LOADER_ID, inLoader, MainActivity.this);
-                        }
-                    })
-                    .show();
+            if (!mHaveOfflineData) {
+                showConnSnackbar();
+            }
         }
     }
 
-    private void addDivider(LinearLayoutManager layoutManager) {
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
-                layoutManager.getOrientation());
-        mRecyclerView.addItemDecoration(dividerItemDecoration);
+    private void showConnSnackbar() {
+        emptyView_text.setVisibility(View.VISIBLE);
+        emptyView_text.setText(R.string.no_internet_text);
+        Snackbar.make(mRecyclerView, R.string.no_internet_text, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.snackbar_tryagain_text, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (isConnected()) {
+                            emptyView_text.setText(R.string.start_hint_text);
+                        } else {
+                            showConnSnackbar();
+                        }
+                    }
+                })
+                .show();
     }
 
     @Override
-    public Loader<ArrayList<Book>> onCreateLoader(int id, Bundle args) {
-        Uri baseUri = Uri.parse(GOOGLE_BOOKS_API_URL);
-        Uri.Builder uriBuilder = baseUri.buildUpon();
-
+    public Loader<List<Item>> onCreateLoader(int id, Bundle args) {
         String query = "";
         if (args != null && !args.isEmpty()) {
             query = args.getString(QUERY_BUNDLE_KEY);
         }
-
-        uriBuilder.appendQueryParameter("q", query);
-        uriBuilder.appendQueryParameter("maxResults", "20");
-
         emptyView_text.setVisibility(View.GONE);
-//        progressBar.setVisibility(View.VISIBLE);
 
-        return new BookLoader(this, uriBuilder.toString());
+        return new BookLoader(this, query);
     }
 
     @Override
-    public void onLoadFinished(Loader<ArrayList<Book>> loader, ArrayList<Book> data) {
-        mRecyclerAdapter.clear();
+    public void onLoadFinished(Loader<List<Item>> loader, List<Item> data) {
         mRecyclerView.hideShimmerAdapter();
 
-        if (data != null && !data.isEmpty())
+        if (data != null && data.size() > 0) {
+            mRecyclerAdapter.clear();
             mRecyclerAdapter.addAll(data);
+        }
 
-//        progressBar.setVisibility(View.GONE;
+        if (isConnected()) {
+            if (data.size() == 0) {
+                Toast.makeText(this, R.string.data_empty_text, Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, R.string.conn_lost_text, Toast.LENGTH_SHORT).show();
+        }
+
         emptyView_text.setVisibility(View.GONE);
     }
 
-
     @Override
-    public void onLoaderReset(Loader<ArrayList<Book>> loader) {
+    public void onLoaderReset(Loader<List<Item>> loader) {
         mRecyclerAdapter.clear();
     }
 
+
     public void onSearchButtonClick(View view) {
-        Bundle inLoader = new Bundle();
-        inLoader.putString(QUERY_BUNDLE_KEY, searchEditText.getText().toString());
-        getSupportLoaderManager().restartLoader(BOOK_QUERY_LOADER_ID, inLoader, this);
-        mRecyclerView.showShimmerAdapter();
+        String query = searchEditText.getText().toString().trim();
+        if (!TextUtils.isEmpty(query) && isConnected()) {
+            Bundle inLoader = new Bundle();
+            inLoader.putString(QUERY_BUNDLE_KEY, query);
+            getSupportLoaderManager().restartLoader(BOOK_QUERY_LOADER_ID, inLoader, this);
+            mRecyclerView.showShimmerAdapter();
+        }
+    }
+
+    private void addDivider(LinearLayoutManager layoutManager) {
+        DividerItemDecoration dividerItemDecoration =
+                new DividerItemDecoration(mRecyclerView.getContext(), layoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
     private boolean isConnected() {
@@ -131,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
             boolean isConnected = activeNetwork.isConnectedOrConnecting();
+
             return isConnected;
         }
 
