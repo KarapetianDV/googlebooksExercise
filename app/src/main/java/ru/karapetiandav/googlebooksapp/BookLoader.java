@@ -16,7 +16,7 @@ public class BookLoader extends AsyncTaskLoader<List<Item>> {
 
     private static final String TAG = BookLoader.class.getSimpleName();
     private String query;
-    private int DEFAULT_MAX_RESULTS = 20;
+    private int DEFAULT_MAX_RESULTS = 40;
 
     public BookLoader(Context context, String query) {
         super(context);

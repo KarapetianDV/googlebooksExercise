@@ -13,10 +13,9 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.karapetiandav.googlebooksapp.rest.ImageLinks;
 import ru.karapetiandav.googlebooksapp.rest.Item;
 import ru.karapetiandav.googlebooksapp.rest.VolumeInfo;
-
-import static ru.karapetiandav.googlebooksapp.BookUtils.extractAuthors;
 
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
@@ -27,6 +26,28 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     public BookAdapter(Context mContext) {
         this.mContext = mContext;
+    }
+
+    public static String extractAuthors(List<String> authors) {
+        StringBuilder builder = new StringBuilder();
+        String delim = "";
+        for (String author : authors) {
+            builder.append(delim).append(author);
+            delim = ", ";
+        }
+
+        return builder.toString();
+    }
+
+    public static String clipText(String text) {
+        if (text.length() > 20) {
+            StringBuilder builder = new StringBuilder(text);
+            builder.replace(20, text.length(), "...");
+
+            return builder.toString();
+        } else {
+            return text;
+        }
     }
 
     @Override
@@ -44,18 +65,31 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
         ImageView bookImage = holder.mBookImage;
 
-        // TODO: Create placeholder, error
+        if (info.getTitle() == null) {
+            info.setTitle("");
+        }
+
+        if (info.getAuthors() == null) {
+            info.setAuthors(new ArrayList<String>());
+        }
+
+        if (info.getImageLinks() == null) {
+            info.setImageLinks(new ImageLinks());
+        }
+
         Picasso
                 .with(mContext)
                 .load(info.getImageLinks().getSmallThumbnailUrl())
+                .error(R.drawable.error_image)
+                .placeholder(R.drawable.error_image)
                 .fit()
                 .into(bookImage);
 
         TextView bookTitle = holder.mBookTitle;
-        bookTitle.setText(info.getTitle());
+        bookTitle.setText(clipText(info.getTitle()));
 
         TextView bookAuthor = holder.mBookAuthors;
-        bookAuthor.setText(extractAuthors(info.getAuthors()));
+        bookAuthor.setText(clipText(extractAuthors(info.getAuthors())));
     }
 
     @Override

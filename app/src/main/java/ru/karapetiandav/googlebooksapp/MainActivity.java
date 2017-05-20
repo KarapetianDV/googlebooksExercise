@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerView.hideShimmerAdapter();
 
         if (data != null && data.size() > 0) {
-            mRecyclerAdapter.clear();
             mRecyclerAdapter.addAll(data);
         }
 
