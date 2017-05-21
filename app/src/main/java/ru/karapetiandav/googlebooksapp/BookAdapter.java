@@ -81,6 +81,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 .with(mContext)
                 .load(info.getImageLinks().getSmallThumbnailUrl())
                 .error(R.drawable.error_image)
+                .fit()
                 .placeholder(R.drawable.error_image)
                 .fit()
                 .into(bookImage);
